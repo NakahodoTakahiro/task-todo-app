@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mention→TODO",
+  title: "Mension",
   description: "Slack/Chatworkのメンションをまとめて管理",
 };
 

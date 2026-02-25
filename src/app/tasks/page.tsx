@@ -81,7 +81,7 @@ export default async function TasksPage({ searchParams }: Props) {
         <div className="px-6 lg:px-10 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center shadow-sm">
-              <span className="text-white text-sm font-black">M</span>
+              <span className="text-white text-base font-black">@</span>
             </div>
             <div>
               <h1 className="text-xl font-black text-gray-900 tracking-tight">Mension</h1>
