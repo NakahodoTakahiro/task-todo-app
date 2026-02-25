@@ -18,7 +18,7 @@ Slack / Chatwork に届いた自分宛メンションを自動収集し、AIが�
 
 | レイヤー       | 技術                              |
 | -------------- | --------------------------------- |
-| フレームワーク | Next.js 14 (App Router)           |
+| フレームワーク | Next.js 16 (App Router)           |
 | 言語           | TypeScript                        |
 | DB             | PostgreSQL 16（Docker）           |
 | ORM            | Prisma                            |
@@ -89,9 +89,8 @@ npm run dev
 
 1. [api.slack.com/apps](https://api.slack.com/apps) でアプリを作成
 2. **Event Subscriptions** を有効化 → Request URL に上記 URL を登録
-3. Subscribe to bot events: `app_mention` を追加
+3. Subscribe to bot events: `message.channels` を追加
 4. **OAuth & Permissions** → Bot Token Scopes に以下を追加
-   - `app_mentions:read`
    - `channels:history`
 5. ワークスペースにアプリをインストール → Bot Token をコピーして `SLACK_BOT_TOKEN` に設定
 

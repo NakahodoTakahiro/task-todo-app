@@ -52,7 +52,6 @@
 | id            | UUID       | PK |
 | title         | String     | TODO のタイトル（初期値はメッセージ本文から生成） |
 | status        | Enum       | `todo` / `doing` / `done` |
-| memo          | String?    | ユーザーが自由に書けるメモ（上書き保存） |
 | groupId       | UUID?      | 束ねグループID（nullable） |
 | createdAt     | DateTime   |      |
 | updatedAt     | DateTime   |      |
@@ -69,6 +68,7 @@
 | body          | String     | メッセージ本文（メンションプレフィックス除去済み） |
 | permalink     | String?    | 元メッセージへのURL |
 | rawPayload    | Json       | Webhook ペイロード原文 |
+| isProcessing  | Boolean    | LLM判定処理中フラグ（処理完了後に false に更新）。true の間は未確認バッジに表示しない |
 | receivedAt    | DateTime   |      |
 
 **ユニーク制約**: `(source, externalId)` → Webhook 重複配信対策
@@ -116,8 +116,7 @@
 | メソッド | パス                        | 説明 |
 | -------- | --------------------------- | ---- |
 | GET      | `/api/tasks`                | タスク一覧 |
-| GET      | `/api/tasks/[id]`           | タスク詳細（紐づくMessage含む） |
-| PATCH    | `/api/tasks/[id]`           | ステータス変更・メモ更新・グループ紐づけ |
+| PATCH    | `/api/tasks/[id]`           | ステータス変更・グループ紐づけ |
 | DELETE   | `/api/tasks/[id]`           | タスク削除 |
 | POST     | `/api/tasks/[id]/group`     | グループ作成・統合 |
 
@@ -295,7 +294,7 @@ export { auth, signIn, signOut } from './basic'   // 今
 - [x] 3.1 Task のステータス設計 → `todo` / `doing` / `done` の3段階（LLM束ね候補があるので inbox 不要）
 - [x] 5.1 Claude API 呼び出しの非同期方式 → fire-and-forget（Vercel 非使用のためシンプルに `void suggest()` で処理）
 - [x] 5.2 LLM処理設計 → 1回のプロンプトで「依頼判定（3段階）」+「類似Task検索」を同時実施。誤判定リスクは救済UIで対応
-- [x] UI のページ構成・操作フロー → `/tasks`（一覧）・`/tasks/[id]`（詳細）の2画面。uncertain はヘッダーバッジ+モーダル
+- [x] UI のページ構成・操作フロー → `/tasks` の1画面で全操作完結。元メッセージはカード内インライン展開。uncertain はヘッダーバッジ+モーダル
 
 ## 10. 将来の改善候補
 

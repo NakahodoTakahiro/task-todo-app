@@ -2,7 +2,7 @@
 
 ## 必要なもの
 
-- Node.js 18以上
+- Node.js 20以上
 - Docker（PostgreSQL起動に使用）
 - Anthropic APIキー（[console.anthropic.com](https://console.anthropic.com) で取得）なくても動作確認可能
 - Slack アプリのトークン類（Slack連携を使う場合）

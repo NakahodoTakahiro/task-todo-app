@@ -15,7 +15,7 @@ Claude API で依頼判定・束ね候補提示を行い、TODO として一元�
 
 ## 技術スタック
 
-- **Next.js 14** (App Router) + TypeScript
+- **Next.js 16** (App Router) + TypeScript
 - **PostgreSQL 16**（Docker）+ Prisma
 - **Claude API**（Anthropic）
 - **Basic認証**（将来 Auth.js に差し替え可能な構造）
@@ -125,7 +125,7 @@ src/lib/db/         # DB操作関数（Prisma クエリはここに集約）
 | -------- | ---- |
 | 1 | 束ね候補バナーUI（承認・却下） |
 | 2 | uncertain Messageモーダル（ヘッダーバッジ + モーダル） |
-| 3 | タスク詳細UI（メモ・元メッセージ・permalink） |
+| 3 | 元メッセージのインライン展開UI（カード内で本文・permalink を表示） |
 | 4 | フィルター（Slack/Chatwork絞り込み） |
 
 ---
