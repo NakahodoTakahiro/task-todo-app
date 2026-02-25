@@ -40,9 +40,9 @@ cp .env.example .env
 
 | 変数名 | 必須 | 説明 |
 |--------|------|------|
-| `DATABASE_URL` | 必須 | 個人のDocker設定に合わせる |
-| `BASIC_AUTH_USER` | 必須 | ログイン時のユーザー名（半角英数字のみ）.env記載|
-| `BASIC_AUTH_PASSWORD` | 必須 | ログイン時のパスワード（半角英数字のみ）.env記載|
+| `DATABASE_URL` | 必須 | デフォルト値のままでOK（`docker-compose.yml` の設定に合わせてあります） |
+| `BASIC_AUTH_USER` | 必須 | ログイン時のユーザー名（`.env.example` の値をそのまま使用可） |
+| `BASIC_AUTH_PASSWORD` | 必須 | ログイン時のパスワード（`.env.example` の値をそのまま使用可） |
 | `ANTHROPIC_API_KEY` | 任意 | Claude APIキー（`sk-ant-` から始まる） |
 | `SLACK_SIGNING_SECRET` | 必須 | Slack Webhook の署名検証キー |
 | `SLACK_USER_ID` | 必須 | 自分の Slack ユーザーID（`U` から始まる） |
