@@ -8,6 +8,16 @@
 - Slack アプリのトークン類（Slack連携を使う場合）
 - Chatwork APIトークン・Webhookトークン（Chatwork連携を使う場合）
 
+### Docker の準備
+
+Docker が未インストールの場合は [Docker Desktop](https://www.docker.com/products/docker-desktop/) をインストールしてください。インストール後、Docker Desktop を起動してからセットアップ手順を進めてください。
+
+```bash
+# インストール確認
+docker --version
+docker compose version
+```
+
 ---
 
 ## 初回セットアップ
@@ -30,10 +40,10 @@ cp .env.example .env
 
 | 変数名 | 必須 | 説明 |
 |--------|------|------|
-| `DATABASE_URL` | 必須 | デフォルト値のままでOK（Docker設定に合わせてあります） |
-| `BASIC_AUTH_USER` | 必須 | ログイン時のユーザー名（半角英数字のみ） |
-| `BASIC_AUTH_PASSWORD` | 必須 | ログイン時のパスワード（半角英数字のみ） |
-| `ANTHROPIC_API_KEY` | 必須 | Claude APIキー（`sk-ant-` から始まる） |
+| `DATABASE_URL` | 必須 | 個人のDocker設定に合わせる |
+| `BASIC_AUTH_USER` | 必須 | ログイン時のユーザー名（半角英数字のみ）.env記載|
+| `BASIC_AUTH_PASSWORD` | 必須 | ログイン時のパスワード（半角英数字のみ）.env記載|
+| `ANTHROPIC_API_KEY` | 任意 | Claude APIキー（`sk-ant-` から始まる） |
 | `SLACK_SIGNING_SECRET` | 必須 | Slack Webhook の署名検証キー |
 | `SLACK_USER_ID` | 必須 | 自分の Slack ユーザーID（`U` から始まる） |
 | `SLACK_BOT_TOKEN` | 任意 | Slack 送信者名を解決する場合に必要（`xoxb-` から始まる） |
@@ -84,3 +94,34 @@ npm run dev
 - [ ] ブラウザで [localhost:3000/tasks](http://localhost:3000/tasks) にアクセスできる
 - [ ] Basic認証ダイアログが表示される（`.env` の `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` を入力）
 - [ ] ログイン後、タスク一覧画面（Mension）が表示される
+
+---
+
+## Webhook の動作確認（SlackやChatworkからの受信テスト）
+
+Slack・Chatwork からローカル環境に Webhook を届けるには、ローカルサーバーを外部公開する必要があります。**ngrok**（または類似ツール）の使用を推奨します。
+
+```bash
+# ngrok のインストール（未インストールの場合）
+brew install ngrok
+
+# ローカルサーバーを公開
+ngrok http 3000
+```
+
+起動すると以下のような転送 URL が発行されます。
+
+```
+Forwarding  https://xxxx-xx-xx-xxx-xx.ngrok-free.app -> http://localhost:3000
+```
+
+この URL を各サービスの Webhook 設定に登録してください。
+
+| サービス | 登録する URL |
+|----------|-------------|
+| Slack | `https://xxxx.ngrok-free.app/api/webhooks/slack` |
+| Chatwork | `https://xxxx.ngrok-free.app/api/webhooks/chatwork` |
+
+> **注意**: ngrok の無料プランでは `ngrok http 3000` を起動するたびに URL が変わります。ngrok を立ち上げ直した場合は各サービスの Webhook 設定も更新してください（`npm run dev` の再起動では URL は変わりません）。
+
+ngrok 以外の代替ツールとして [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) や [localtunnel](https://github.com/localtunnel/localtunnel) も利用できます。

@@ -61,17 +61,20 @@ model TaskGroup {
   title     String
   createdAt DateTime @default(now())
 
-  tasks Task[]
+  tasks       Task[]
+  suggestions GroupSuggestion[]
 }
 
 model GroupSuggestion {
   id               String           @id @default(uuid())
   newTaskId        String
-  candidateTaskId  String
+  candidateTaskId  String?
+  candidateGroupId String?
   reason           String?
   status           SuggestionStatus @default(pending)
   createdAt        DateTime         @default(now())
 
-  newTask       Task @relation("NewTask", fields: [newTaskId], references: [id], onDelete: Cascade)
-  candidateTask Task @relation("CandidateTask", fields: [candidateTaskId], references: [id], onDelete: Cascade)
+  newTask        Task       @relation("NewTask", fields: [newTaskId], references: [id], onDelete: Cascade)
+  candidateTask  Task?      @relation("CandidateTask", fields: [candidateTaskId], references: [id], onDelete: Cascade)
+  candidateGroup TaskGroup? @relation(fields: [candidateGroupId], references: [id], onDelete: Cascade)
 }

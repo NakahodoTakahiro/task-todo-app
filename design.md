@@ -91,14 +91,23 @@
 
 ### GroupSuggestion（LLM による束ね候補）
 
-| カラム         | 型         | 説明 |
-| -------------- | ---------- | ---- |
-| id             | UUID       | PK |
-| newTaskId      | UUID       | 新着Task |
-| candidateTaskId| UUID       | 候補Task |
-| reason         | String?    | LLMが類似と判断した理由 |
-| status         | Enum       | `pending` / `accepted` / `rejected` |
-| createdAt      | DateTime   |      |
+| カラム          | 型         | 説明 |
+| --------------- | ---------- | ---- |
+| id              | UUID       | PK |
+| newTaskId       | UUID       | 新着Task |
+| candidateTaskId | UUID?      | 候補Task（グループ未所属の場合に設定） |
+| candidateGroupId| UUID?      | 候補グループ（既存グループと類似の場合に設定） |
+| reason          | String?    | LLMが類似と判断した理由 |
+| status          | Enum       | `pending` / `accepted` / `rejected` |
+| createdAt       | DateTime   |      |
+
+`candidateTaskId` と `candidateGroupId` はどちらか一方が必ず設定される。
+
+**グループ集約ロジック**: `similar_task_ids` を受け取った後、同じグループに属するタスクは1件の `GroupSuggestion`（candidateGroupId）に集約する。グループ未所属のタスクは従来通り個別の `GroupSuggestion`（candidateTaskId）として作成する。
+
+**承認時の動作の違い**:
+- `candidateGroupId` あり → 既存グループに新タスクを追加（グループ名の入力不要）
+- `candidateTaskId` あり  → 新規グループを作成（グループ名の入力が必要）
 
 ---
 
@@ -163,7 +172,9 @@ Webhook受信
   → 200を即返す
   → [fire-and-forget] Claude APIを呼び出し（1回のプロンプトで2役）
         ├─ actionable → Task作成
-        │                 ├─ 類似Taskあり → GroupSuggestion作成 → UIにバナー表示
+        │                 ├─ 類似Taskあり → グループ集約してGroupSuggestion作成 → UIにバナー表示
+        │                 │     ├─ 候補がグループ所属 → candidateGroupId で1件に集約
+        │                 │     └─ 候補がグループ未所属 → candidateTaskId で個別作成
         │                 └─ 類似Taskなし → そのままTODO一覧に表示
         ├─ uncertain  → Messageはそのまま保存（taskId: null） → ヘッダーバッジに表示
         └─ not_actionable → Messageを物理削除

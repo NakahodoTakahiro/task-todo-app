@@ -7,7 +7,8 @@ type Suggestion = {
   id: string
   reason: string | null
   newTask: { id: string; title: string }
-  candidateTask: { id: string; title: string }
+  candidateTask: { id: string; title: string } | null
+  candidateGroup: { id: string; title: string } | null
 }
 
 export default function SuggestionBanner() {
@@ -29,17 +30,23 @@ export default function SuggestionBanner() {
   }, [])
 
   async function handleAccept(suggestion: Suggestion) {
-    const defaultTitle = `${suggestion.newTask.title} / ${suggestion.candidateTask.title}`
-    const title = window.prompt('グループ名を入力してください', defaultTitle)
-    // null = キャンセル、空文字・スペースのみ = 無効
-    if (!title || !title.trim()) return
+    let body: { title?: string } = {}
+
+    // グループへの追加: タイトル不要
+    // 個別タスクのまとめ: グループ名を入力
+    if (!suggestion.candidateGroup) {
+      const defaultTitle = `${suggestion.newTask.title} / ${suggestion.candidateTask?.title ?? ''}`
+      const title = window.prompt('グループ名を入力してください', defaultTitle)
+      if (!title || !title.trim()) return
+      body = { title: title.trim() }
+    }
 
     setAccepting(suggestion.id)
     try {
       const res = await fetch(`/api/suggestions/${suggestion.id}/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim() }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error('accept failed')
       setSuggestions((prev) => prev.filter((s) => s.id !== suggestion.id))
@@ -69,31 +76,37 @@ export default function SuggestionBanner() {
 
   return (
     <div className="border border-yellow-200 rounded-lg overflow-hidden divide-y divide-yellow-100 bg-yellow-50">
-      {suggestions.map((s) => (
-        <div key={s.id} className="px-4 py-3">
-          <p className="text-sm text-yellow-800">
-            <span className="mr-1">⚠</span>
-            「{s.newTask.title}」と「{s.candidateTask.title}」は同じ依頼かもしれません
-          </p>
-          {s.reason && <p className="mt-0.5 text-xs text-yellow-600">{s.reason}</p>}
-          <div className="mt-2 flex justify-end gap-2">
-            <button
-              onClick={() => handleReject(s.id)}
-              disabled={rejecting === s.id || accepting === s.id}
-              className="rounded border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50"
-            >
-              別々のままにする
-            </button>
-            <button
-              onClick={() => handleAccept(s)}
-              disabled={accepting === s.id || rejecting === s.id}
-              className="rounded border border-yellow-300 bg-white px-3 py-1 text-xs font-medium text-yellow-800 hover:text-yellow-900 disabled:opacity-50"
-            >
-              まとめる
-            </button>
+      {suggestions.map((s) => {
+        const candidateName = s.candidateGroup
+          ? `「${s.candidateGroup.title}」グループ`
+          : `「${s.candidateTask?.title ?? ''}」`
+
+        return (
+          <div key={s.id} className="px-4 py-3">
+            <p className="text-sm text-yellow-800">
+              <span className="mr-1">⚠</span>
+              「{s.newTask.title}」と{candidateName}は同じ依頼かもしれません
+            </p>
+            {s.reason && <p className="mt-0.5 text-xs text-yellow-600">{s.reason}</p>}
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                onClick={() => handleReject(s.id)}
+                disabled={rejecting === s.id || accepting === s.id}
+                className="rounded border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50"
+              >
+                別々のままにする
+              </button>
+              <button
+                onClick={() => handleAccept(s)}
+                disabled={accepting === s.id || rejecting === s.id}
+                className="rounded border border-yellow-300 bg-white px-3 py-1 text-xs font-medium text-yellow-800 hover:text-yellow-900 disabled:opacity-50"
+              >
+                まとめる
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

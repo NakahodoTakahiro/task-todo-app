@@ -7,6 +7,7 @@ export async function GET() {
     include: {
       newTask: true,
       candidateTask: true,
+      candidateGroup: true,
     },
     orderBy: { createdAt: 'desc' },
   })
