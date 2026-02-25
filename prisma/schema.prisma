@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  todo
+  doing
+  done
+}
+
+enum MessageSource {
+  slack
+  chatwork
+}
+
+enum SuggestionStatus {
+  pending
+  accepted
+  rejected
+}
+
+model Task {
+  id        String     @id @default(uuid())
+  title     String
+  status    TaskStatus @default(todo)
+  groupId   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  group            TaskGroup?        @relation(fields: [groupId], references: [id])
+  messages         Message[]
+  newSuggestions   GroupSuggestion[] @relation("NewTask")
+  candSuggestions  GroupSuggestion[] @relation("CandidateTask")
+}
+
+model Message {
+  id          String        @id @default(uuid())
+  taskId      String?
+  source      MessageSource
+  externalId  String
+  senderName  String
+  body        String
+  permalink   String?
+  rawPayload  Json
+  receivedAt  DateTime      @default(now())
+
+  isProcessing Boolean @default(true)
+
+  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([source, externalId])
+}
+
+model TaskGroup {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+
+  tasks Task[]
+}
+
+model GroupSuggestion {
+  id               String           @id @default(uuid())
+  newTaskId        String
+  candidateTaskId  String
+  reason           String?
+  status           SuggestionStatus @default(pending)
+  createdAt        DateTime         @default(now())
+
+  newTask       Task @relation("NewTask", fields: [newTaskId], references: [id], onDelete: Cascade)
+  candidateTask Task @relation("CandidateTask", fields: [candidateTaskId], references: [id], onDelete: Cascade)
+}
