@@ -67,7 +67,7 @@ describe('processWebhookEvent', () => {
     await flushAsync()
 
     expect(mockCreateTask).toHaveBeenCalledWith(
-      EVENT.body.slice(0, 100),
+      EVENT.body.slice(0, 50),
       SAVED_MESSAGE.id
     )
     expect(mockCreateSuggestions).toHaveBeenCalledWith(

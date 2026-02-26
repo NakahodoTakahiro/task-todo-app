@@ -13,7 +13,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     if (message.taskId) return { error: 'Already linked to a task', status: 400 } as const
 
     const task = await tx.task.create({
-      data: { title: message.body.slice(0, 100) },
+      data: { title: message.body.slice(0, 50) },
     })
     await tx.message.update({
       where: { id },

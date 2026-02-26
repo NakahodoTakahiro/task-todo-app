@@ -25,7 +25,7 @@ export async function processWebhookEvent(event: IncomingEvent): Promise<void> {
       }
 
       if (result.judgment === 'actionable') {
-        const task = await createTask(event.body.slice(0, 100), message.id)
+        const task = await createTask(event.body.slice(0, 50), message.id)
         await createSuggestions(task.id, result.similar_task_ids, result.reason)
       }
 
