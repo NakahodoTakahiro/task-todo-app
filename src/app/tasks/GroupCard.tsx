@@ -18,7 +18,7 @@ type Task = {
   groupId: string | null
   createdAt: string
   group: { id: string; title: string } | null
-  messages: Message[]
+  message: Message | null
 }
 
 type Props = {

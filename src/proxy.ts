@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth } from '@/lib/auth'
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   if (!checkAuth(req.headers.get('authorization'))) {
     return new NextResponse('Unauthorized', {
       status: 401,

@@ -10,13 +10,13 @@ type Task = {
   groupId: string | null
   createdAt: string
   group: { id: string; title: string } | null
-  messages: {
+  message: {
     source: string
     senderName: string
     body: string
     permalink: string | null
     receivedAt: string
-  }[]
+  } | null
 }
 
 const STATUS_STYLES: Record<Task['status'], string> = {
@@ -50,7 +50,7 @@ export default function TaskCard({ task, inGroup = false }: { task: Task; inGrou
   const [expanded, setExpanded] = useState(false)
   const [leavingGroup, setLeavingGroup] = useState(false)
 
-  const firstMessage = task.messages[0]
+  const firstMessage = task.message
 
   async function handleStatusChange(newStatus: string) {
     const prev = status

@@ -25,14 +25,10 @@ export default async function TasksPage({ searchParams }: Props) {
   const [tasks, uncertainCount] = await Promise.all([
     prisma.task.findMany({
       where: sourceFilter
-        ? { messages: { some: { source: sourceFilter } } }
+        ? { message: { source: sourceFilter } }
         : {},
       include: {
-        messages: {
-          where: sourceFilter ? { source: sourceFilter } : {},
-          orderBy: { receivedAt: 'asc' },
-          take: 1,
-        },
+        message: true,
         group: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -47,13 +43,13 @@ export default async function TasksPage({ searchParams }: Props) {
     groupId: t.groupId,
     createdAt: t.createdAt.toISOString(),
     group: t.group ? { id: t.group.id, title: t.group.title } : null,
-    messages: t.messages.map((m) => ({
-      source: m.source,
-      senderName: m.senderName,
-      body: m.body,
-      permalink: m.permalink,
-      receivedAt: m.receivedAt.toISOString(),
-    })),
+    message: t.message ? {
+      source: t.message.source,
+      senderName: t.message.senderName,
+      body: t.message.body,
+      permalink: t.message.permalink,
+      receivedAt: t.message.receivedAt.toISOString(),
+    } : null,
   }))
 
   const todoCount = serialized.filter((t) => t.status === 'todo').length

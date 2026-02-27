@@ -33,14 +33,14 @@ model Task {
   updatedAt DateTime   @updatedAt
 
   group            TaskGroup?        @relation(fields: [groupId], references: [id])
-  messages         Message[]
+  message          Message?
   newSuggestions   GroupSuggestion[] @relation("NewTask")
   candSuggestions  GroupSuggestion[] @relation("CandidateTask")
 }
 
 model Message {
   id          String        @id @default(uuid())
-  taskId      String?
+  taskId      String?   @unique
   source      MessageSource
   externalId  String
   senderName  String
