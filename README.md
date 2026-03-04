@@ -70,6 +70,7 @@ npm run dev
 | `BASIC_AUTH_PASSWORD`    | Basic認証のパスワード（半角英数字・記号のみ）               | 任意の文字列                            |
 | `ANTHROPIC_API_KEY`      | Claude API キー                                             | Anthropic Console                       |
 | `SLACK_SIGNING_SECRET`   | Webhook 署名検証用シークレット                              | Slack App 管理画面 → Basic Information  |
+| `SLACK_USER_ID`          | 自分の Slack ユーザーID（メンション検出に使用）             | Slack プロフィール → メンバーID         |
 | `SLACK_BOT_TOKEN`        | Bot API トークン（`xoxb-` から始まる）                      | Slack App 管理画面 → OAuth & Permissions|
 | `CHATWORK_WEBHOOK_TOKEN` | Webhook 検証トークン                                        | Chatwork 管理画面 → Webhook             |
 | `CHATWORK_API_TOKEN`     | API アクセストークン                                        | Chatwork 管理画面 → API トークン        |
@@ -184,15 +185,18 @@ src/
       types.ts                    # IncomingEvent 共通型
       slack.ts                    # Slack → IncomingEvent 変換
       chatwork.ts                 # Chatwork → IncomingEvent 変換
-      index.ts                    # アダプター振り分け
     auth/
       index.ts                    # アプリ全体が参照するエントリーポイント
       basic.ts                    # Basic認証（現在の実装）
-      nextauth.ts                 # Google OAuth（将来の実装）
     db/
+      prisma.ts                   # Prisma クライアント
       tasks.ts                    # Task 操作
       messages.ts                 # Message 操作
       suggestions.ts              # GroupSuggestion 操作
+    llm/
+      judge.ts                    # Claude API 呼び出し・判定
+      prompts.ts                  # プロンプト定義
+    webhook-processor.ts          # Webhook 受信後の処理フロー
   middleware.ts                   # Basic認証チェック
   prisma/
     schema.prisma
