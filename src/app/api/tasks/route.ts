@@ -5,7 +5,7 @@ export async function GET() {
   const tasks = await prisma.task.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      messages: { orderBy: { receivedAt: 'asc' } },
+      message: true,
       group: true,
     },
   })

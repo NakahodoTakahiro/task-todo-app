@@ -20,6 +20,11 @@ export async function POST(req: NextRequest, { params }: Params) {
         where: { id: suggestion.newTaskId },
         data: { groupId: suggestion.candidateGroupId },
       })
+      // newTaskId を candidateTask として参照している他のpending提案をグループ提案に付け替え
+      await tx.groupSuggestion.updateMany({
+        where: { candidateTaskId: suggestion.newTaskId, status: 'pending' },
+        data: { candidateTaskId: null, candidateGroupId: suggestion.candidateGroupId },
+      })
       await tx.groupSuggestion.update({ where: { id }, data: { status: 'accepted' } })
       return tx.taskGroup.findUnique({ where: { id: suggestion.candidateGroupId } })
     }
@@ -33,6 +38,14 @@ export async function POST(req: NextRequest, { params }: Params) {
     await tx.task.updateMany({
       where: { id: { in: [suggestion.newTaskId, suggestion.candidateTaskId!] } },
       data: { groupId: created.id },
+    })
+    // newTaskId / candidateTaskId を candidateTask として参照している他のpending提案をグループ提案に付け替え
+    await tx.groupSuggestion.updateMany({
+      where: {
+        candidateTaskId: { in: [suggestion.newTaskId, suggestion.candidateTaskId!] },
+        status: 'pending',
+      },
+      data: { candidateTaskId: null, candidateGroupId: created.id },
     })
     await tx.groupSuggestion.update({ where: { id }, data: { status: 'accepted' } })
     return created
